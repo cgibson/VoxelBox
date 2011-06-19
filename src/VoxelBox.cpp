@@ -18,10 +18,8 @@ namespace VoxelBox {
         printf("Hello, VoxelBox.\n");
     }
 
-    BrickGrid *loadAsBrickGrid(const string filename)
+    BrickGrid loadAsBrickGrid(const string filename)
     {
-        BrickGrid *grid;
-        
         ifstream myFile(filename.c_str(), ios::in | ios::binary);
 
         // MetaData
@@ -36,7 +34,7 @@ namespace VoxelBox {
         free(data);
         
         // Create grid
-        grid = new BrickGrid(metaData.brick_dim_x * BRICK_DIM,metaData.brick_dim_y * BRICK_DIM,metaData.brick_dim_z * BRICK_DIM);
+        BrickGrid grid = BrickGrid(metaData.brick_dim_x * BRICK_DIM,metaData.brick_dim_y * BRICK_DIM,metaData.brick_dim_z * BRICK_DIM);;
 
         int pos_x, pos_y, pos_z;
         for(int i = 0; i < metaData.brick_count; i++) {
@@ -46,7 +44,7 @@ namespace VoxelBox {
                 exit(1);
             }
             Brick *brick = deserializeDensityBrick(data, &pos_x, &pos_y, &pos_z);
-            grid->brick(brick, pos_x, pos_y, pos_z);
+            grid.brick(brick, pos_x, pos_y, pos_z);
             free(data);
         }
         myFile.close();
@@ -54,16 +52,17 @@ namespace VoxelBox {
         return grid;
     }
 
-    void *load(const string filename)
+    BrickGrid load(const string filename)
     {
         std::string::const_iterator pos = std::find(filename.begin(), filename.end(), '.');
         std::string type(pos+1, filename.end());
 
 
         if(type == "brk") {
-            return (void*)loadAsBrickGrid(filename);
+            return loadAsBrickGrid(filename);
         }else{
             printf("File type '%s' not supported\n", type.c_str());
+            exit(1);
         }
         
     }
@@ -153,21 +152,21 @@ namespace VoxelBox {
         return metaData;
     }
 
-    void save(BrickGrid *grid, const string filename)
+    void save(BrickGrid grid, const string filename)
     {
         ofstream myFile;
         myFile.open (filename.c_str(), ios::out | ios::binary);
 
         // MetaData
-        VolumeMetaDataV1 metaData = {DENSITY_BRICK_SIZE, grid->brickCount(), grid->brick_size_x(), grid->brick_size_y(), grid->brick_size_z()};
+        VolumeMetaDataV1 metaData = {DENSITY_BRICK_SIZE, grid.brickCount(), grid.brick_size_x(), grid.brick_size_y(), grid.brick_size_z()};
         char *data = serializeMetaData(metaData);
         myFile.write(data, VOLUME_METADATA_V1_SIZE);
         free(data);
 
-        for(int i = 0; i < grid->brick_size_x(); i++) {
-            for(int j = 0; j < grid->brick_size_y(); j++) {
-                for(int k = 0; k < grid->brick_size_z(); k++) {
-                    data = seriializeDensityBrick(grid->brick(i,j,k), i,j,k);
+        for(int i = 0; i < grid.brick_size_x(); i++) {
+            for(int j = 0; j < grid.brick_size_y(); j++) {
+                for(int k = 0; k < grid.brick_size_z(); k++) {
+                    data = seriializeDensityBrick(grid.brick(i,j,k), i,j,k);
                     myFile.write(data, DENSITY_BRICK_SIZE);
                     free(data);
                 }

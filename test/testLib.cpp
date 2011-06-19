@@ -7,9 +7,9 @@ int main(int argc, char* argv[]) {
 
     // TEST - SERIALIZATION AND DESERIALIZATION OF BRICKS
     
-    BrickGrid *grid = new BrickGrid(64,64,64, 0.1);
+    BrickGrid grid = BrickGrid(64,64,64, 0.1);
 
-    Brick *b1 = grid->brick(0,0,0);
+    Brick *b1 = grid.brick(0,0,0);
 
     char *data = VoxelBox::seriializeDensityBrick(b1, 1, 2, 3);
 
@@ -55,15 +55,13 @@ int main(int argc, char* argv[]) {
 
     VoxelBox::save(grid, "test.brk");
 
-    BrickGrid *grid2 = (BrickGrid*)VoxelBox::load("test.brk");
-
-    assert(grid2 != NULL);
+    BrickGrid grid2 = VoxelBox::load("test.brk");
 
     for(int i = 0; i < 64; i++) {
         for(int j = 0; j < 64; j++) {
             for(int k = 0; k < 64; k++) {
-                Voxel *v1 = (*grid)(i,j,k);
-                Voxel *v2 = (*grid2)(i,j,k);
+                Voxel *v1 = grid(i,j,k);
+                Voxel *v2 = grid2(i,j,k);
                 assert((*v1)(DENSITY) - (*v2)(DENSITY) < 0.00001);
             }
         }

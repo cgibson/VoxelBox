@@ -11,7 +11,7 @@ namespace VoxelBox {
 
     void hello();
 
-    BrickGrid *loadAsBrickGrid(const string filename);
+    BrickGrid loadAsBrickGrid(const string filename);
 
     Brick* deserializeDensityBrick(char *data, int *x, int *y, int *z);
     char* seriializeDensityBrick(Brick *brick, int x, int y, int z);
@@ -19,9 +19,9 @@ namespace VoxelBox {
     char *serializeMetaData(VolumeMetaDataV1 metaData);
     VolumeMetaDataV1 deserializeMetaData(char *data);
 
-    void *load(const string filename);
+    BrickGrid load(const string filename);
     
-    void save(BrickGrid *grid, const string filename);
+    void save(BrickGrid grid, const string filename);
 };
 
 #endif
